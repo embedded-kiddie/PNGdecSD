@@ -1,6 +1,6 @@
 /*================================================================================
  * Loading PNG files from SD card to LCD with TFT_eSPI and PNGdec
- * https://github.com/bitbank2/PNGdec (version >= 1.1.6)
+ * https://github.com/bitbank2/PNGdec (version >= 1.1.4)
  * https://github.com/bitbank2/PNGdec/wiki
  *================================================================================*/
 #include <SD.h>
@@ -108,7 +108,7 @@ static int pngDraw(PNGDRAW *pDraw) {
   tft.pushImage(start_x, start_y + pDraw->y, pDraw->iWidth, 1, lineBuffer);
   tft.endWrite();
 
-  return pDraw->iWidth;
+  return true;
 }
 
 void setup(void) {

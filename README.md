@@ -17,6 +17,7 @@
 | Platform type              | [ESP32 Dev Module][3] |
 | TFT_eSPI                   | [1.2.7][4]            |
 | SD card library            | [SD library][5]       |
+| PNG decode library         | [PNGdec >= 1.1.4][6]  |
 
 ## To Do
 - [ ] Parallelization utilising dual-core with dedicated SPI bus for SD and TFT.
@@ -31,3 +32,4 @@
 [3]: https://github.com/espressif/arduino-esp32/tree/master/variants/esp32 "arduino-esp32/variants/esp32 at master · espressif/arduino-esp32"
 [4]: https://github.com/lovyan03/LovyanGFX/releases/tag/1.2.7 "Release 1.2.7 · lovyan03/LovyanGFX"
 [5]: https://github.com/espressif/arduino-esp32/tree/master/libraries/SD "arduino-esp32/libraries/SD at master · espressif/arduino-esp32"
+[6]: https://github.com/bitbank2/PNGdec "bitbank2/PNGdec: An optimized PNG decoder suitable for microcontrollers and PCs"
