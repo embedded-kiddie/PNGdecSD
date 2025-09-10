@@ -9,6 +9,7 @@
 - `User_Setup.h`  
   [TFT_eSPI][4] configuration file for CYD and ILI9341 / ST7789.
 
+## Components
 | Components                 | Link / Version        |
 | -------------------------- | --------------------- |
 | Arduino IDE                | [Version 2.3.4][1]    |
