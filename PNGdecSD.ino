@@ -8,7 +8,7 @@
 #include <PNGdec.h>
 #include <string.h>
 
-#define USE_SDFAT 1
+#define USE_SDFAT 0
 #if USE_SDFAT
 #define DISABLE_FS_H_WARNING
 #include <SdFat.h>
@@ -26,8 +26,8 @@
 static SdFat SD;
 typedef FsFile File;
 
-// SHARED_SPI or DEDICATED_SPI
-#define USE_DEDICATED_SPI   1
+// SHARED_SPI (0) or DEDICATED_SPI (1)
+#define USE_DEDICATED_SPI   0
 
 #if USE_DEDICATED_SPI
 static SPIClass sd_spi = SPIClass(HSPI);
@@ -170,9 +170,9 @@ void loop(void) {
       if (ret == PNG_SUCCESS) {
         uint32_t t = millis();
 
-        tft.startWrite();
+        //tft.startWrite();
           ret = png.decode(NULL, 0); // decode and draw
-        tft.endWrite();
+        //tft.endWrite();
 
         Serial.printf("%s: %d\n", name, millis() - t);
       }
