@@ -3,15 +3,17 @@
  * https://github.com/bitbank2/PNGdec (version >= 1.1.4)
  * https://github.com/bitbank2/PNGdec/wiki
  *================================================================================*/
-#include <SD.h>
+#include <SPI.h>
 #include <TFT_eSPI.h>
 #include <PNGdec.h>
+#include <string.h>
 
-#define DEBUG   0
-#if     DEBUG
-#define DBG_EXEC(x) x
+#define USE_SDFAT 1
+#if USE_SDFAT
+#define DISABLE_FS_H_WARNING
+#include <SdFat.h>
 #else
-#define DBG_EXEC(x)
+#include <SD.h>
 #endif
 
 /*--------------------------------------------------------------------------------
@@ -19,7 +21,24 @@
  *--------------------------------------------------------------------------------*/
 #define SD_CS         SS        // defined in pins_arduino.h
 #define SD_SPI_CLOCK  24000000  // 24 MHz for ESP32-2432S028
-#define SD_CONFIG     SD_CS, SPI, SD_SPI_CLOCK
+
+#if USE_SDFAT
+static SdFat SD;
+typedef FsFile File;
+
+// SHARED_SPI or DEDICATED_SPI
+#define USE_DEDICATED_SPI   1
+
+#if USE_DEDICATED_SPI
+static SPIClass sd_spi = SPIClass(HSPI);
+#define SD_CONFIG SdSpiConfig(SD_CS, DEDICATED_SPI, SD_SPI_CLOCK, &sd_spi)
+#else
+#define SD_CONFIG SdSpiConfig(SD_CS, SHARED_SPI, SD_SPI_CLOCK, &SPI) // VSPI
+#endif // USE_DEDICATED_SPI
+
+#else // Espressif standard SD library
+#define SD_CONFIG SD_CS, SPI, SD_SPI_CLOCK
+#endif // USE_SDFAT
 
 /*--------------------------------------------------------------------------------
  * TFT settings
@@ -44,11 +63,9 @@ static uint16_t start_y = 0;
  *--------------------------------------------------------------------------------*/
 static void * myOpen(const char *filename, int32_t *pFileSize) {
   if (myFile) {
-    DBG_EXEC(Serial.println("open: success"));
     *pFileSize = myFile.size();
     return &myFile;
   } else {
-    DBG_EXEC(Serial.println("open: failed"));
     *pFileSize = 0;
     return NULL;
   }
@@ -58,8 +75,6 @@ static void * myOpen(const char *filename, int32_t *pFileSize) {
  * typedef void (PNG_CLOSE_CALLBACK)(void *pHandle);
  *--------------------------------------------------------------------------------*/
 static void myClose(void *pHandle) {
-  DBG_EXEC(Serial.println("close"));
-
   if (myFile) {
     myFile.close();
   }
@@ -71,10 +86,8 @@ static void myClose(void *pHandle) {
 static int32_t myRead(PNGFILE *pFile, uint8_t *pBuf, int32_t iLen) {
   if (myFile) {
     int32_t len = myFile.read(pBuf, iLen);
-    DBG_EXEC(Serial.printf("read: %d --> %d\n", iLen, len));
     return len;
   } else {
-    DBG_EXEC(Serial.println("read: error"));
     return 0;
   }
 }
@@ -83,12 +96,9 @@ static int32_t myRead(PNGFILE *pFile, uint8_t *pBuf, int32_t iLen) {
  * typedef int32_t (PNG_SEEK_CALLBACK)(PNGFILE *pFile, int32_t iPosition);
  *--------------------------------------------------------------------------------*/
 static int32_t mySeek(PNGFILE *pFile, int32_t iPosition) {
-  DBG_EXEC(Serial.printf("seek: %d\n", iPosition));
-
   if (myFile) {
     return myFile.seek(iPosition);
   } else {
-    DBG_EXEC(Serial.println("seek: error"));
     return 0;
   }
 }
@@ -99,24 +109,20 @@ static int32_t mySeek(PNGFILE *pFile, int32_t iPosition) {
  * you will need to adapt this function to suit.
  *--------------------------------------------------------------------------------*/
 static int pngDraw(PNGDRAW *pDraw) {
-  DBG_EXEC(Serial.printf("pngDraw y: %d, iWidth: %d\n", pDraw->y, pDraw->iWidth));
-
   uint16_t lineBuffer[TFT_WIDTH > TFT_HEIGHT ? TFT_WIDTH : TFT_HEIGHT];
   png.getLineAsRGB565(pDraw, lineBuffer, PNG_RGB565_BIG_ENDIAN, 0xffffffff);
 
-  tft.startWrite();
+//tft.startWrite();
   tft.pushImage(start_x, start_y + pDraw->y, pDraw->iWidth, 1, lineBuffer);
-  tft.endWrite();
+//tft.endWrite();
 
   return true;
 }
 
 void setup(void) {
-  DBG_EXEC({
-    Serial.begin(115200);
-    while (millis() < 1000);
-    Serial.println(USER_SETUP_INFO);      // Check if User_Setup.h is included correctly
-  });
+  Serial.begin(115200);
+  while (millis() < 1000);
+  Serial.println(USER_SETUP_INFO);        // Check if User_Setup.h is included correctly
 
   tft.init();                             // Start the tft display
   tft.initDMA();                          // Enable DMA
@@ -124,10 +130,14 @@ void setup(void) {
   tft.fillScreen(TFT_WHITE);              // Clear the screen before writing to it
   tft.setTextColor(TFT_BLACK, TFT_WHITE); // Set text color black in white
 
+#if USE_DEDICATED_SPI
+  sd_spi.begin(SCK, MISO, MOSI, SD_CS);
+#endif
+
   if (SD.begin(SD_CONFIG)) {
-    DBG_EXEC(Serial.println("SD Card initialized."));
+    Serial.println("SD Card initialized.");
   } else {
-    DBG_EXEC(Serial.println("SD Card initialization failed!"));
+    Serial.println("SD Card initialization failed!");
     while (true);
   }
 }
@@ -146,19 +156,25 @@ void loop(void) {
       continue;
     }
 
+#if USE_SDFAT
+    char buf[BUFSIZ]; // 128
+    myFile.getName(buf, sizeof(buf));
+    const char *name = buf;
+#else
     const char *name = myFile.name();
+#endif
     if (name[0] != '.' && (strstr(name, ".PNG") || strstr(name, ".png"))) {
-      DBG_EXEC(Serial.printf("Displaying: %s\n", name));
 
       int ret = png.open(name, myOpen, myClose, myRead, mySeek, pngDraw);
-      DBG_EXEC(Serial.printf("open: %d\n", ret)); // PNG_SUCCESS = 0
 
       if (ret == PNG_SUCCESS) {
-        DBG_EXEC(Serial.printf("width: %d, height: %d\n", png.getWidth(), png.getHeight()));
+        uint32_t t = millis();
 
-        ret = png.decode(NULL, 0); // decode and draw
+        tft.startWrite();
+          ret = png.decode(NULL, 0); // decode and draw
+        tft.endWrite();
 
-        DBG_EXEC(Serial.printf("decode: %d\n", ret));
+        Serial.printf("%s: %d\n", name, millis() - t);
       }
 
       png.close();
