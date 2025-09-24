@@ -71,6 +71,11 @@ void loop(void) {
       delay(5000);
     }
 
+    else if (strstr(name, ".qoi")) {
+      tft.drawQoiFile(SD, path.c_str(), 0, 0);
+      delay(5000);
+    }
+
     myFile.close();
   }
 
