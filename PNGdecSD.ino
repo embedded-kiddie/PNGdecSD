@@ -1,11 +1,20 @@
 /*================================================================================
- * Loading PNG files from SD card to LCD with TFT_eSPI and PNGdec
+ * Loading PNG files from SD card to LCD with TFT_eSPI / LovyanGFX and PNGdec
  * https://github.com/bitbank2/PNGdec (version >= 1.1.4)
  * https://github.com/bitbank2/PNGdec/wiki
  *================================================================================*/
 #include <SD.h>
-#include <TFT_eSPI.h>
+
+#if   0
 #include <PNGdec.h>
+#include <TFT_eSPI.h>
+static PNG png;
+static TFT_eSPI tft = TFT_eSPI();
+#else
+#define LGFX_AUTODETECT
+#include <LovyanGFX.h>
+static LGFX tft;
+#endif
 
 #define DEBUG   0
 #if     DEBUG
@@ -28,13 +37,15 @@
 #define TFT_HEIGHT  320
 #define TFT_ROTATION  0
 
+#define TFT_BL_PWM_FREQUECCY  12000 // [Hz]
+#define TFT_BL_PWM_RESOUTION  8     // [bit]
+
 /*--------------------------------------------------------------------------------
  * Global variables
  *--------------------------------------------------------------------------------*/
-static TFT_eSPI tft = TFT_eSPI();
 static File myFile;
-static PNG png;
 
+#if defined (__PNGDEC__)
 // Display start position
 static uint16_t start_x = 0;
 static uint16_t start_y = 0;
@@ -110,19 +121,27 @@ static int pngDraw(PNGDRAW *pDraw) {
 
   return true;
 }
+#endif // __PNGDEC__
 
 void setup(void) {
   DBG_EXEC({
     Serial.begin(115200);
     while (millis() < 1000);
-    Serial.println(USER_SETUP_INFO);      // Check if User_Setup.h is included correctly
   });
 
   tft.init();                             // Start the tft display
   tft.initDMA();                          // Enable DMA
   tft.setRotation(TFT_ROTATION);          // Set the TFT display rotation
   tft.fillScreen(TFT_WHITE);              // Clear the screen before writing to it
-  tft.setTextColor(TFT_BLACK, TFT_WHITE); // Set text color black in white
+
+#if defined (LOVYANGFX_HPP_)
+  // The following can coltrol the LCD brightness
+  tft.setBrightness(255); // duty: 0 to 255
+#else
+  // The following does not work even if the duty is to 255
+//ledcAttach(TFT_BL, TFT_BL_PWM_FREQUECCY, TFT_BL_PWM_RESOUTION); // Configure the PWM pin with frequency resolution
+//ledcWrite(TFT_BL, 255); // duty: 0 to 255
+#endif
 
   if (SD.begin(SD_CONFIG)) {
     DBG_EXEC(Serial.println("SD Card initialized."));
@@ -147,7 +166,12 @@ void loop(void) {
     }
 
     const char *name = myFile.name();
-    if (name[0] != '.' && (strstr(name, ".PNG") || strstr(name, ".png"))) {
+    if (name[0] == '.') {
+      myFile.close();
+      continue;
+    }
+#if defined (_TFT_eSPIH_)
+    if (strstr(name, ".PNG") || strstr(name, ".png")) {
       DBG_EXEC(Serial.printf("Displaying: %s\n", name));
 
       int ret = png.open(name, myOpen, myClose, myRead, mySeek, pngDraw);
@@ -161,10 +185,29 @@ void loop(void) {
         DBG_EXEC(Serial.printf("decode: %d\n", ret));
       }
 
+      delay(5000);
       png.close();
+    }
+#else
+    if (strstr(name, ".PNG") || strstr(name, ".png")) {
+      DBG_EXEC(Serial.printf("Displaying: %s\n", name));
+      std::string path = std::string("/") + name;
+      tft.drawPngFile(SD, path.c_str(), 0, 0);
+
       delay(5000);
     }
+
+    if (strstr(name, ".jpg") || strstr(name, ".jpeg")) {
+      DBG_EXEC(Serial.printf("Displaying: %s\n", name));
+
+      std::string path = std::string("/") + name;
+      tft.drawJpgFile(SD, path.c_str(), 0, 0);
+
+      delay(5000);
+    }
+#endif
     myFile.close();
   }
+
   root.close();
 }

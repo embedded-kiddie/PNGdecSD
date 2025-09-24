@@ -24,8 +24,10 @@
 - [ ] Transition effect using sprites.
 
 ## Sample photos
-- Sample1.png by [Emma Swoboda](https://unsplash.com/@emmakphoto?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) on [Unsplash](https://unsplash.com/photos/snow-capped-mountain-peak-bathed-in-golden-sunlight-B9fkw_aO6fo?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)
-- Sample2.png by [Yevhenii Deshko](https://unsplash.com/@edeshko?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) on [Unsplash](https://unsplash.com/photos/white-church-steeple-against-a-pastel-sky-with-birds-ieY_9lJnLNs?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)
+- sample1.png by [Emma Swoboda](https://unsplash.com/@emmakphoto) on [Unsplash](https://unsplash.com/photos/snow-capped-mountain-peak-bathed-in-golden-sunlight-B9fkw_aO6fo)
+- sample2.png by [Yevhenii Deshko](https://unsplash.com/@edeshko) on [Unsplash](https://unsplash.com/photos/white-church-steeple-against-a-pastel-sky-with-birds-ieY_9lJnLNs)
+- sample3.jpg by [Tobias Reich](https://unsplash.com/@electerious) on [Unsplash](https://unsplash.com/photos/cityscape-features-tall-buildings-and-an-iconic-clock-tower-RyCf_x0o7a0)
+- sample4.jpg by [Max Böhme](https://unsplash.com/@max_boehme) on [Unsplash](https://unsplash.com/photos/a-beautiful-white-washed-alleyway-in-italy-lEKC2KHoDWE)
 
 [1]: https://github.com/arduino/arduino-ide/releases/tag/2.3.4 "Release 2.3.4 · arduino/arduino-ide"
 [2]: https://github.com/espressif/arduino-esp32/releases/tag/3.3.0 "Release Arduino Release v3.3.0 based on ESP-IDF v5.5.0 · espressif/arduino-esp32"
