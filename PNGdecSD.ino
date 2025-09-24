@@ -1,5 +1,5 @@
 /*================================================================================
- * Loading PNG files from SD card to LCD with TFT_eSPI / LovyanGFX and PNGdec
+ * Loading PNG/JPG files from SD card to LCD with TFT_eSPI/LovyanGFX and PNGdec
  * https://github.com/bitbank2/PNGdec (version >= 1.1.4)
  * https://github.com/bitbank2/PNGdec/wiki
  *================================================================================*/
@@ -170,8 +170,10 @@ void loop(void) {
       myFile.close();
       continue;
     }
+
 #if defined (_TFT_eSPIH_)
-    if (strstr(name, ".PNG") || strstr(name, ".png")) {
+
+    if (strstr(name, ".png")) {
       DBG_EXEC(Serial.printf("Displaying: %s\n", name));
 
       int ret = png.open(name, myOpen, myClose, myRead, mySeek, pngDraw);
@@ -188,10 +190,14 @@ void loop(void) {
       delay(5000);
       png.close();
     }
-#else
-    if (strstr(name, ".PNG") || strstr(name, ".png")) {
+
+#else // LovyanGFX
+
+    std::string path = std::string("/") + name;
+
+    if (strstr(name, ".png")) {
       DBG_EXEC(Serial.printf("Displaying: %s\n", name));
-      std::string path = std::string("/") + name;
+
       tft.drawPngFile(SD, path.c_str(), 0, 0);
 
       delay(5000);
@@ -200,7 +206,6 @@ void loop(void) {
     if (strstr(name, ".jpg") || strstr(name, ".jpeg")) {
       DBG_EXEC(Serial.printf("Displaying: %s\n", name));
 
-      std::string path = std::string("/") + name;
       tft.drawJpgFile(SD, path.c_str(), 0, 0);
 
       delay(5000);

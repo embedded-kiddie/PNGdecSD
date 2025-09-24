@@ -15,9 +15,10 @@
 | Arduino IDE                | [Version 2.3.4][1]    |
 | esp32 by Espressif Systems | [v3.3.0][2]           |
 | Platform type              | [ESP32 Dev Module][3] |
-| TFT_eSPI                   | [1.2.7][4]            |
-| SD card library            | [SD library][5]       |
-| PNG decode library         | [PNGdec >= 1.1.4][6]  |
+| TFT_eSPI                   | [V2.5.43][4]            |
+| LovyanGFX                  | [1.2.7][5]            |
+| SD card library            | [SD library][6]       |
+| PNG decode library         | [PNGdec >= 1.1.4][7]  |
 
 ## To Do
 - [ ] Parallelization utilising dual-core with dedicated SPI bus for SD and TFT.
@@ -32,6 +33,7 @@
 [1]: https://github.com/arduino/arduino-ide/releases/tag/2.3.4 "Release 2.3.4 · arduino/arduino-ide"
 [2]: https://github.com/espressif/arduino-esp32/releases/tag/3.3.0 "Release Arduino Release v3.3.0 based on ESP-IDF v5.5.0 · espressif/arduino-esp32"
 [3]: https://github.com/espressif/arduino-esp32/tree/master/variants/esp32 "arduino-esp32/variants/esp32 at master · espressif/arduino-esp32"
-[4]: https://github.com/lovyan03/LovyanGFX/releases/tag/1.2.7 "Release 1.2.7 · lovyan03/LovyanGFX"
-[5]: https://github.com/espressif/arduino-esp32/tree/master/libraries/SD "arduino-esp32/libraries/SD at master · espressif/arduino-esp32"
-[6]: https://github.com/bitbank2/PNGdec "bitbank2/PNGdec: An optimized PNG decoder suitable for microcontrollers and PCs"
+[4]: https://github.com/Bodmer/TFT_eSPI/releases/tag/V2.5.43 "Release Bug fixes · Bodmer/TFT_eSPI"
+[5]: https://github.com/lovyan03/LovyanGFX/releases/tag/1.2.7 "Release 1.2.7 · lovyan03/LovyanGFX"
+[6]: https://github.com/espressif/arduino-esp32/tree/master/libraries/SD "arduino-esp32/libraries/SD at master · espressif/arduino-esp32"
+[7]: https://github.com/bitbank2/PNGdec "bitbank2/PNGdec: An optimized PNG decoder suitable for microcontrollers and PCs"
