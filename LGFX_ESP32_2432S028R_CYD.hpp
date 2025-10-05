@@ -4,6 +4,21 @@
 
 // Example of settings for LovyanGFX on ESP32
 // https://github.com/espressif/arduino-esp32/blob/master/variants/jczn_2432s028r/pins_arduino.h
+#ifndef CYD_TFT_SPI_BUS
+#define CYD_TFT_DC      2
+#define CYD_TFT_MISO    12
+#define CYD_TFT_MOSI    13
+#define CYD_TFT_SCK     14
+#define CYD_TFT_CS      15
+#define CYD_TFT_BL      21
+#define CYD_TP_IRQ      36
+#define CYD_TP_MOSI     32
+#define CYD_TP_MISO     39
+#define CYD_TP_CLK      25
+#define CYD_TP_CS       33
+#define CYD_TFT_SPI_BUS HSPI
+#define CYD_TP_SPI_BUS  VSPI
+#endif
 
 /*
 Copy this file, give it a new name, and change the settings to suit your environment.
@@ -94,7 +109,7 @@ public:
   {
     { //Sets the bus control.
       auto cfg = _bus_instance.config();    // Get the bus configuration structure.
-//*
+
 // SPI bus settings
       cfg.spi_host = HSPI_HOST;     // Select the SPI (ESP32-S2,C3: SPI2_HOST or SPI3_HOST / ESP32: VSPI_HOST or HSPI_HOST)
       // Due to the ESP-IDF version upgrade, the VSPI_HOST and HSPI_HOST are deprecated, so if an error occurs, use SPI2_HOST and SPI3_HOST instead.
@@ -109,10 +124,10 @@ public:
       cfg.use_lock   = true;        // Set to true if transaction lock is used
       cfg.dma_channel = SPI_DMA_CH_AUTO; // Set the DMA channel (0=DMA not used / 1=1ch / 2=2ch / SPI_DMA_CH_AUTO=automatic)
       // Due to the ESP-IDF version upgrade, SPI_DMA_CH_AUTO is recommended. Specifying 1ch or 2ch is no longer recommended.
-      cfg.pin_sclk = 14;            // Set the SPI SCLK pin [CYD_TFT_SCK]
-      cfg.pin_mosi = 13;            // Set the SPI MOSI pin [CYD_TFT_MOSI]
-      cfg.pin_miso = 12;            // Set the SPI MISO pin (-1 = disable) [CYD_TFT_MISO]
-      cfg.pin_dc   = 2;             // Set the SPI D/C  pin (-1 = disable) [CYD_TFT_DC]
+      cfg.pin_sclk = CYD_TFT_SCK;   // Set the SPI SCLK pin
+      cfg.pin_mosi = CYD_TFT_MOSI;  // Set the SPI MOSI pin
+      cfg.pin_miso = CYD_TFT_MISO;  // Set the SPI MISO pin (-1 = disable)
+      cfg.pin_dc   = CYD_TFT_DC;    // Set the SPI D/C  pin (-1 = disable)
      // When you use a common SPI bus with the SD card, be sure to set MISO and do not omit it.
 //*/
 /*
@@ -148,7 +163,7 @@ public:
     { // Configure the display panel control settings.
       auto cfg = _panel_instance.config();    // Get the structure for display panel settings.
 
-      cfg.pin_cs           = 15;          // CS   pin number (-1 = disable) CYD_TFT_CS
+      cfg.pin_cs           = CYD_TFT_CS;  // CS   pin number (-1 = disable)
       cfg.pin_rst          = -1;          // RST  pin number (-1 = disable) CYD_TFT_RS = CYD_TFT_CS, RESET is connected to board RST
       cfg.pin_busy         = -1;          // BUSY pin number (-1 = disable)
 
@@ -183,7 +198,7 @@ public:
     { // Set the backlight control. (Delete if not required)
       auto cfg = _light_instance.config();    // Get the backlight setting structure
 
-      cfg.pin_bl = 21;              // Backlight pin number [CYD_TFT_BL]
+      cfg.pin_bl = CYD_TFT_BL;      // Backlight pin number
       cfg.invert = false;           // Set to true if the backlight brightness is inverted
       cfg.freq   = 12000;           // Backlight PWM frequency
       cfg.pwm_channel = 7;          // The PWM channel number
@@ -193,7 +208,7 @@ public:
     }
 //*/
 
-//
+//*
     { // Configure touch screen control (delete if not needed)
       auto cfg = _touch_instance.config();
 
@@ -201,7 +216,7 @@ public:
       cfg.x_max = 3800;         // Maximum X value (raw value) from touch screen
       cfg.y_min = 3700;         // Minimum Y value (raw value) from touch screen
       cfg.y_max =  200;         // Maximum Y value (raw value) from touch screen
-      cfg.pin_int = 36;         // Interrupt pin number [CYD_TP_IRQ]
+      cfg.pin_int = CYD_TP_IRQ; // Interrupt pin number
       cfg.bus_shared = false;   // Set to true if the bus shared with the screen
 #if DISPLAY_CYD_2USB
       cfg.offset_rotation = 2;  // Adjust when display and touch orientation do not match (0~7)
@@ -210,12 +225,12 @@ public:
 #endif
 
 // For SPI connection
-      cfg.spi_host = -1;            // Select the SPI (HSPI_HOST or VSPI_HOST) or only XPT2046 can be set to -1.
+      cfg.spi_host = -1;            // Select the SPI (HSPI_HOST or VSPI_HOST) or XPT2046 can be set to -1 for Bit Banging
       cfg.freq = 1000000;           // Set the SPI clock
-      cfg.pin_sclk = 25;            // SCLK pin number [CYD_TP_CLK]
-      cfg.pin_mosi = 32;            // MOSI pin number [CYD_TP_MOSI]
-      cfg.pin_miso = 39;            // MISO pin number [CYD_TP_MISO]
-      cfg.pin_cs   = 33;            // CS   pin number [CYD_TP_CS]
+      cfg.pin_sclk = CYD_TP_CLK;    // SCLK pin number
+      cfg.pin_mosi = CYD_TP_MOSI;   // MOSI pin number
+      cfg.pin_miso = CYD_TP_MISO;   // MISO pin number
+      cfg.pin_cs   = CYD_TP_CS;     // CS   pin number
 
 // For I2C connection
       //cfg.i2c_port = 1;      // Select the I2C (0 or 1)
