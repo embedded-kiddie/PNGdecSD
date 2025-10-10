@@ -4,7 +4,7 @@
 #include <SD.h>
 
 // Auto-detect and manual configuration settings
-#define USE_AUTODETECT false
+#define USE_AUTODETECT true
 
 #if USE_AUTODETECT
 // Some devices do not support auto-detect since the panel ID cannot be read.
